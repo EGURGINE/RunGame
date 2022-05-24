@@ -11,14 +11,27 @@ public class Player : MonoBehaviour
     public bool isWall;
     [SerializeField] private Slider jumpSlider;
     private float cnt = 0;
+    private Rigidbody2D rb;
+    private void Start()
+    {
+        rb = GetComponent<Rigidbody2D>();
+    }
     void Update()
     {
-        jumpSlider.transform.position = Camera.main.WorldToScreenPoint(
-            new Vector3(transform.position.x - 1.5f, transform.position.y, transform.position.z));
-        if (Input.GetMouseButton(0))
+        if (Input.GetMouseButtonDown(0))
+        {
+            this.spd = 0.08f;
+        }
+        transform.Translate(this.spd/2, 0, 0);
+        this.spd *= 0.98f;//감속
+        #region 점프
+        jumpSlider.transform.position = Camera.main.WorldToScreenPoint(//점프게이지 위치 설정
+            new Vector3(transform.position.x - 1.5f, 
+            transform.position.y, transform.position.z));
+        if (Input.GetMouseButton(0)&&isGround)
         {
             cnt += 0.01f;
-            jumpSlider.value = cnt / 1;
+            jumpSlider.value = cnt / 2;
         }
         else 
         {
@@ -26,19 +39,16 @@ public class Player : MonoBehaviour
             jumpSlider.value = 0;
         }
 
-        if (jumpSlider.value == 1)
+        if (jumpSlider.value == 1 && isGround)
         {
             jumpSlider.value = 0;
-            if (isWall)
-            {
-                //벽 타기
-            }
-            else if (isGround)
-            {
-                //점프
-            }
-            else return;
+            Jump(30f, 20f);
         }
+        #endregion
+    }
+    private void Jump(float x, float y)
+    {
+        rb.AddForce(new Vector2(x, y));
     }
     private void OnCollisionEnter2D(Collision2D collision)
     {
