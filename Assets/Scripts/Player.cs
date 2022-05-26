@@ -9,6 +9,7 @@ public class Player : MonoBehaviour
     public bool isThoch;
     public bool isGround;
     public bool isWall;
+    public bool isStairs;
     [SerializeField] private Slider jumpSlider;
     private float cnt = 0;
     private Rigidbody2D rb;
@@ -25,11 +26,18 @@ public class Player : MonoBehaviour
         {
             this.spd = 0.08f;
         }
+        
         transform.Translate(this.spd, 0, 0);
-        this.spd *= 0.99f;//감속
+        if (this.spd >= 0)
+        {
+            this.spd *= 0.99f;//감속
+        }
         #endregion
 
-
+        if (Input.GetMouseButtonDown(0) && isWall)
+        {
+            Jump(10f * isRight, 5f);
+        }
         #region 점프
         //점프게이지 위치 설정
         jumpSlider.transform.position = Camera.main.WorldToScreenPoint(
@@ -40,11 +48,11 @@ public class Player : MonoBehaviour
         {
             if (isWall)
             {
-                rb.AddForce(Vector2.up*4*Time.deltaTime, ForceMode2D.Impulse);
+                rb.AddForce(Vector2.up*0.35f, ForceMode2D.Impulse);
             }
 
             cnt += Time.deltaTime;
-            jumpSlider.value = cnt / 0.5f;
+            jumpSlider.value = cnt / 1f;
         }
         else
         {
@@ -54,6 +62,7 @@ public class Player : MonoBehaviour
 
         if (jumpSlider.value == 1)
         {
+            cnt = 0;
             jumpSlider.value = 0;
 
             if (isWall)
@@ -72,27 +81,38 @@ public class Player : MonoBehaviour
     }
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.collider.tag == "Ground")
+        switch (collision.collider.tag)
         {
-            isGround = true;
-        }
-        if (collision.collider.tag == "Wall")
-        {
-            isWall = true;
-            if (collision.transform.position.x>transform.position.x) isRight = -1;
-            else isRight = 1;
-            Debug.Log(isRight);
+            case "Ground":
+                isGround = true;
+                break;
+            case "Wall":
+                isWall = true;
+                if (collision.transform.position.x > transform.position.x) isRight = -1;
+                else isRight = 1;
+                Debug.Log(isRight);
+                break;
+            case "Stairs":
+                isStairs = true;
+                break;
         }
     }
     private void OnCollisionExit2D(Collision2D collision)
     {
-        if (collision.collider.tag == "Ground")
+        switch (collision.collider.tag)
         {
-            isGround = false;
-        }
-        if (collision.collider.tag == "Wall")
-        {
-            isWall = false;
+            case "Ground":
+                isGround = false;
+
+                break;
+            case "Wall":
+                isWall = false;
+
+                break;
+            case "Stairs":
+                isStairs = false;
+
+                break;
         }
     }
 }
