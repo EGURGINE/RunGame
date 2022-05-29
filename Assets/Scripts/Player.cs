@@ -19,24 +19,24 @@ public class Player : MonoBehaviour
     {
         rb = GetComponent<Rigidbody2D>();
     }
-    void FixedUpdate()
+    private void Update()
     {
         #region 이동
         if (Input.GetMouseButtonDown(0) && isGround&&!isWall)
         {
-            this.spd = 0.08f;
+            this.spd += 5f;
+            rb.velocity = new Vector2(spd, rb.velocity.y);
         }
-        
-        transform.Translate(this.spd, 0, 0);
+
         if (this.spd >= 0)
         {
             this.spd *= 0.99f;//감속
         }
         #endregion
 
-        if (Input.GetMouseButtonDown(0) && isWall)
+        if (Input.GetMouseButtonUp(0)&&jumpSlider.value>=0.5f)
         {
-            Jump(10f * isRight, 5f);
+            Jump(10f*spd * isRight, 5f);
         }
         #region 점프
         //점프게이지 위치 설정
@@ -48,7 +48,11 @@ public class Player : MonoBehaviour
         {
             if (isWall)
             {
-                rb.AddForce(Vector2.up*0.35f, ForceMode2D.Impulse);
+                if (jumpSlider.value == 1)
+                {
+                    Jump(20f * isRight, 10f);
+                }
+                rb.AddForce(Vector2.up*0.05f, ForceMode2D.Impulse);
             }
 
             cnt += Time.deltaTime;
