@@ -755,7 +755,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 84b1a84b61563c74eb4d51cf58afb52e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  spd: 0
+  spd: 1
   isThoch: 0
   isGround: 0
   isWall: 0

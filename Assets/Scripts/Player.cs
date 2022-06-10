@@ -12,13 +12,9 @@ public class Player : MonoBehaviour
     public bool isStairs;
     [SerializeField] private Slider jumpSlider;
     private float cnt = 0;
-    private Rigidbody2D rb;
+    private Rigidbody2D rb => GetComponent<Rigidbody2D>();
 
     private int isRight = 1;
-    private void Start()
-    {
-        rb = GetComponent<Rigidbody2D>();
-    }
     private void Update()
     {
         #region 이동
@@ -36,7 +32,8 @@ public class Player : MonoBehaviour
 
         if (Input.GetMouseButtonUp(0)&&jumpSlider.value>=0.5f)
         {
-            Jump(10f*spd * isRight, 5f);
+            if (isGround == false && isWall == false) return;
+            Jump(spd+=5 * isRight, 5f);
         }
         #region 점프
         //점프게이지 위치 설정
@@ -48,11 +45,11 @@ public class Player : MonoBehaviour
         {
             if (isWall)
             {
+                rb.AddForce(Vector2.up*0.1f, ForceMode2D.Impulse);
                 if (jumpSlider.value == 1)
                 {
                     Jump(20f * isRight, 10f);
                 }
-                rb.AddForce(Vector2.up*0.05f, ForceMode2D.Impulse);
             }
 
             cnt += Time.deltaTime;
@@ -88,6 +85,7 @@ public class Player : MonoBehaviour
         switch (collision.collider.tag)
         {
             case "Ground":
+                isRight = 1;
                 isGround = true;
                 break;
             case "Wall":
